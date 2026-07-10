@@ -35,11 +35,11 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: /health\.api\.spec\.ts/,
+      testIgnore: /\.api\.spec\.ts/,
     },
     {
       name: "api",
-      testMatch: /health\.api\.spec\.ts/,
+      testMatch: /\.api\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         baseURL: apiUrl,
