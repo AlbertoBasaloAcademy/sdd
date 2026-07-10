@@ -1,10 +1,11 @@
-import { apiRouter } from "./api/api.js";
 import cors from "cors";
-import { errorHandler } from "./server/errors.js";
 import express from "express";
-import { listen } from "./server/listener.js";
-import { port } from "./server/config.js";
+import { apiRouter } from "./api/api.js";
 import { startHealthTracking } from "./api/health/health.service.js";
+import { startRockets } from "./api/rockets/rockets.service.js";
+import { port } from "./server/config.js";
+import { errorHandler } from "./server/errors.js";
+import { listen } from "./server/listener.js";
 
 const app = express();
 app.use(cors());
@@ -15,4 +16,5 @@ app.use("/api", apiRouter);
 app.use(errorHandler);
 
 startHealthTracking();
+startRockets();
 listen(app, port);

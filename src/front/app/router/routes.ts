@@ -15,6 +15,27 @@ export const routes: Route[] = [
     title: `About — ${appTitle}`,
   },
   {
+    load: async () => import("./rockets-page.component.js").then((m) => m.tagName),
+    menu: { href: "/rockets", label: "Fleet" },
+    pattern: new URLPattern({ pathname: "/rockets" }),
+    title: `Rocket Fleet — ${appTitle}`,
+  },
+  {
+    load: async () => import("./rocket-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/rockets/new" }),
+    title: `New Rocket — ${appTitle}`,
+  },
+  {
+    load: async () => import("./rocket-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/rockets/:rocketId/edit" }),
+    title: `Edit Rocket — ${appTitle}`,
+  },
+  {
+    load: async () => import("./rocket-detail-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/rockets/:rocketId" }),
+    title: "Rocket — Details",
+  },
+  {
     load: async () => import("./item-detail-page.component.js").then((m) => m.tagName),
     pattern: new URLPattern({ pathname: "/items/:itemId" }),
     title: "Item — Details",
