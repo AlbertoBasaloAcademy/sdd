@@ -15,6 +15,16 @@ export const routes: Route[] = [
     title: `About — ${appTitle}`,
   },
   {
+    load: async () => import("./rocket-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/rockets/new" }),
+    title: `Add rocket — ${appTitle}`,
+  },
+  {
+    load: async () => import("./rocket-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/rockets/:rocketId/edit" }),
+    title: `Edit rocket — ${appTitle}`,
+  },
+  {
     load: async () => import("./item-detail-page.component.js").then((m) => m.tagName),
     pattern: new URLPattern({ pathname: "/items/:itemId" }),
     title: "Item — Details",
