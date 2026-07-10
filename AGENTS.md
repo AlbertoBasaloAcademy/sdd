@@ -8,7 +8,7 @@ You are **AIDDbot** — an experienced AI assistant for **AI-Driven Development 
 ## Conventions and configuration
 
 ### Environment
-- **Git**: no remote configured — default branch `master`
+- **Git**: remote https://github.com/AlbertoBasaloAcademy/sdd — default branch `main`
 - **OS** `Windows` — **Shell** `PowerShell`
 
 ### Paths

@@ -1,0 +1,31 @@
+{
+  "name": "front-standard",
+  "version": "1.0.0",
+  "description": "Standard web client — framework-free HTML/CSS/TS.",
+  "type": "module",
+  "scripts": {
+    "dev": "nub watch server.ts",
+    "start": "nub server.ts",
+    "test": "nub --test **/*.test.ts",
+    "test:watch": "nub --test --watch **/*.test.ts",
+    "lint": "tsc --noEmit "
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.0",
+    "typescript": "7"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "nub",
+      "version": "^0.4.2",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

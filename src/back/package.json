@@ -1,0 +1,33 @@
+{
+  "name": "back-express",
+  "version": "1.0.0",
+  "description": "Back-end Express archetype",
+  "type": "module",
+  "scripts": {
+    "dev": "nub watch server.ts",
+    "start": "nub server.ts",
+    "test": "nub --test **/*.test.ts",
+    "test:watch": "nub --test --watch **/*.test.ts",
+    "lint": "tsc --noEmit "
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.0",
+    "typescript": "^7.0.2"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "nub",
+      "version": "^0.4.2",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

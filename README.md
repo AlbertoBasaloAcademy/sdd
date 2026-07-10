@@ -3,7 +3,7 @@
 Spec-driven development workshop.
 
 ## Demo Project
-Monorepo fro AstroBookings project.
+[Monorepo](https://github.com/AlbertoBasaloAcademy/sdd) for AstroBookings project.
 
 | Piece  | Path           | Docs                    |
 | ------ | -------------- | ----------------------- |

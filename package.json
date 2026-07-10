@@ -1,0 +1,32 @@
+{
+  "name": "lab-udemy-sdd",
+  "version": "1.0.0",
+  "description": "Spec-driven development workshop",
+  "author": {
+    "name": "Alberto Basalo",
+    "email": "albertbasalo@aicode.academy",
+    "url": "https://albertobasalo.dev"
+  },
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "src/back",
+    "src/front",
+    "src/e2e"
+  ],
+  "scripts": {
+    "start": "nub run -r --parallel --if-present start",
+    "dev": "nub run -r --parallel --if-present dev",
+    "test": "nub run -r --if-present test",
+    "test:e2e": "nub run -r --parallel --if-present test:e2e",
+    "lint": "nub run -r --if-present lint",
+    "format": "nub run -r --if-present format"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "nub",
+      "version": "^0.4.2",
+      "onFail": "warn"
+    }
+  }
+}
