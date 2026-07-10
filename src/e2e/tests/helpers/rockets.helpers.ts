@@ -27,11 +27,14 @@ export const buildRocketPayload = (overrides: Partial<RocketPayload> = {}): Rock
   ...overrides,
 });
 
+const DEFAULT_API_PORT = 3000;
+const apiBaseUrl = `http://localhost:${process.env["API_PORT"] ?? DEFAULT_API_PORT}`;
+
 export const createRocketViaApi = async (
   request: APIRequestContext,
   overrides: Partial<RocketPayload> = {},
 ): Promise<Rocket> => {
-  const response = await request.post("/api/rockets", {
+  const response = await request.post(`${apiBaseUrl}/api/rockets`, {
     data: buildRocketPayload(overrides),
   });
   expect(response.status()).toBe(201);

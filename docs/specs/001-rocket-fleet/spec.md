@@ -1,3 +1,11 @@
+---
+spec-id: 001
+spec-name: Rocket Fleet
+spec-slug: rocket-fleet
+spec-date: 2026-07-10
+status: completed
+---
+
 # 001 Rocket Fleet Spec
 
 ## Problem definition
@@ -53,10 +61,10 @@
 
 ## Verification criteria
 
-- [ ] **AC-001.1** — WHEN the user navigates to the front page, THEN the list of rockets should be displayed
-- [ ] **AC-001.2** — WHEN the user adds a new rocket, THEN the rocket should be added to the list
-- [ ] **AC-001.3** — WHEN the user edits a rocket, THEN the rocket should be updated in the list
-- [ ] **AC-001.4** — WHEN the user deactivates a rocket, THEN the rocket should be removed from the list
-- [ ] **AC-001.5** — WHEN the user tries to add a new rocket with invalid data, THEN the user should see an error message
-- [ ] **AC-001.6** — WHEN the user tries to edit a rocket with invalid data, THEN the user should see an error message
-- [ ] **AC-001.7** — WHEN the user tries to deactivate a rocket with invalid data, THEN the user should see an error message
+- [x] **AC-001.1** — WHEN the user navigates to the front page, THEN the list of rockets should be displayed
+- [x] **AC-001.2** — WHEN the user adds a new rocket, THEN the rocket should be added to the list
+- [x] **AC-001.3** — WHEN the user edits a rocket, THEN the rocket should be updated in the list
+- [x] **AC-001.4** — WHEN the user deactivates a rocket, THEN the rocket should be removed from the list
+- [x] **AC-001.5** — WHEN the user tries to add a new rocket with invalid data, THEN the user should see an error message
+- [x] **AC-001.6** — WHEN the user tries to edit a rocket with invalid data, THEN the user should see an error message
+- [x] **AC-001.7** — WHEN the user tries to deactivate a rocket with invalid data, THEN the user should see an error message
