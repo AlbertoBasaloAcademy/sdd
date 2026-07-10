@@ -1,3 +1,10 @@
+---
+spec-id: {NNN}
+spec-name: {Feature Name}
+spec-slug: {feature-slug}
+spec-date: {YYYY-MM-DD}
+status: {pending, in-progress, failed, completed}
+---
 #  {NNN} {Feature Name}  Spec
 
 ## Problem definition
