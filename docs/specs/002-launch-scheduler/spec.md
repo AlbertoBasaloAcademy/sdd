@@ -3,7 +3,7 @@ spec-id: 002
 spec-name: Launch Scheduler
 spec-slug: launch-scheduler
 spec-date: 2026-07-11
-status: pending
+status: completed
 ---
 
 # 002 Launch Scheduler Spec
@@ -83,13 +83,13 @@ status: pending
 
 ## Verification criteria
 
-- [ ] **AC-002.1** — WHEN the user navigates to the launch scheduler page, THEN the list of launches should be displayed
-- [ ] **AC-002.2** — WHEN the user schedules a new launch with valid data, THEN the launch should appear in the list with status `created`
-- [ ] **AC-002.3** — WHEN the user edits a non-terminal launch, THEN the launch should be updated in the list
-- [ ] **AC-002.4** — WHEN the user confirms a launch in status `created`, THEN the launch status should become `confirmed`
-- [ ] **AC-002.5** — WHEN the user cancels a launch in status `created` or `confirmed`, THEN the launch status should become `cancelled`
-- [ ] **AC-002.6** — WHEN the user completes a launch in status `confirmed`, THEN the launch status should become `completed`
-- [ ] **AC-002.7** — WHEN the user tries to schedule a launch with a non-Active rocket, THEN the user should see an error message
-- [ ] **AC-002.8** — WHEN the user tries to schedule or update a launch with a past date and time, THEN the user should see an error message
-- [ ] **AC-002.9** — WHEN the user tries to schedule or update a launch with invalid price, THEN the user should see an error message
-- [ ] **AC-002.10** — WHEN the user tries to edit or change the status of a terminal launch, THEN the user should see an error message
+- [x] **AC-002.1** — WHEN the user navigates to the launch scheduler page, THEN the list of launches should be displayed
+- [x] **AC-002.2** — WHEN the user schedules a new launch with valid data, THEN the launch should appear in the list with status `created`
+- [x] **AC-002.3** — WHEN the user edits a non-terminal launch, THEN the launch should be updated in the list
+- [x] **AC-002.4** — WHEN the user confirms a launch in status `created`, THEN the launch status should become `confirmed`
+- [x] **AC-002.5** — WHEN the user cancels a launch in status `created` or `confirmed`, THEN the launch status should become `cancelled`
+- [x] **AC-002.6** — WHEN the user completes a launch in status `confirmed`, THEN the launch status should become `completed`
+- [x] **AC-002.7** — WHEN the user tries to schedule a launch with a non-Active rocket, THEN the user should see an error message
+- [x] **AC-002.8** — WHEN the user tries to schedule or update a launch with a past date and time, THEN the user should see an error message
+- [x] **AC-002.9** — WHEN the user tries to schedule or update a launch with invalid price, THEN the user should see an error message
+- [x] **AC-002.10** — WHEN the user tries to edit or change the status of a terminal launch, THEN the user should see an error message
