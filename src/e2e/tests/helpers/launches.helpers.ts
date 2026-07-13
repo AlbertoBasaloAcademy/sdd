@@ -41,7 +41,7 @@ export const toDatetimeLocalValue = (iso: string): string => {
 };
 
 export const formatPrice = (price: number): string =>
-  new Intl.NumberFormat(undefined, { currency: "USD", style: "currency" }).format(price);
+  new Intl.NumberFormat("en-US", { currency: "USD", style: "currency" }).format(price);
 
 export const buildLaunchPayload = (
   rocketId: string,

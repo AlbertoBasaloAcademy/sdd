@@ -67,7 +67,7 @@ export const expectToast = async (
   message: string | RegExp,
   kind: "success" | "error" = "success",
 ): Promise<void> => {
-  const toast = page.locator(`.toast-${kind}`);
+  const toast = page.locator(`.toast-${kind}`).filter({ hasText: message }).last();
   await expect(toast).toBeVisible();
   await expect(toast).toHaveText(message);
 };
