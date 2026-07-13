@@ -171,6 +171,26 @@ article:hover {
   border: 1px solid var(--ab-glass-border);
 }
 
+.fleet-status-created {
+  color: var(--pico-primary);
+  border: 1px solid var(--pico-primary);
+}
+
+.fleet-status-confirmed {
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+}
+
+.fleet-status-cancelled {
+  opacity: 0.7;
+  border: 1px solid var(--ab-glass-border);
+}
+
+.fleet-status-completed {
+  color: #3498db;
+  border: 1px solid #3498db;
+}
+
 .btn-sm {
   --pico-font-size: 0.72rem;
   margin: 0;

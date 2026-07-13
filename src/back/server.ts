@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { apiRouter } from "./api/api.js";
 import { startHealthTracking } from "./api/health/health.service.js";
+import { startLaunches } from "./api/launches/launches.service.js";
 import { startRockets } from "./api/rockets/rockets.service.js";
 import { port } from "./server/config.js";
 import { errorHandler } from "./server/errors.js";
@@ -17,4 +18,5 @@ app.use(errorHandler);
 
 startHealthTracking();
 startRockets();
+startLaunches();
 listen(app, port);

@@ -15,6 +15,22 @@ export const routes: Route[] = [
     title: `About — ${appTitle}`,
   },
   {
+    load: async () => import("./launch-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/launches/new" }),
+    title: `Schedule launch — ${appTitle}`,
+  },
+  {
+    load: async () => import("./launch-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/launches/:launchId/edit" }),
+    title: `Edit launch — ${appTitle}`,
+  },
+  {
+    load: async () => import("./launch-scheduler-page.component.js").then((m) => m.tagName),
+    menu: { href: "/launches", label: "Launches" },
+    pattern: new URLPattern({ pathname: "/launches" }),
+    title: `Launch Scheduler — ${appTitle}`,
+  },
+  {
     load: async () => import("./rocket-form-page.component.js").then((m) => m.tagName),
     pattern: new URLPattern({ pathname: "/rockets/new" }),
     title: `Add rocket — ${appTitle}`,
