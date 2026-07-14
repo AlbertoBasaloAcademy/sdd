@@ -1,5 +1,5 @@
 # Launch scheduler specification
-_Exported on 7/13/2026 at 11:57:52 GMT+2 from Cursor (3.11.13)_
+_Exported on 7/14/2026 at 12:36:46 GMT+2 from Cursor (3.11.19)_
 
 ---
 
@@ -11,75 +11,40 @@ _Exported on 7/13/2026 at 11:57:52 GMT+2 from Cursor (3.11.13)_
 
 **Cursor**
 
-I'll run the verify workflow for the launch scheduler spec — reading the spec, report template, and related e2e tests first.
+Running verification for the launch-scheduler spec: reading the spec, report template, and related e2e tests.
 
 
-Checking for existing verification reports and how e2e tests are run.
+Identified spec `002-launch-scheduler`, e2e suite `launches.page.spec.ts` (13 AC tests), and an existing report showing 2 failures. Running the e2e tests now.
 
 
-**Research — spec 002 Launch Scheduler**
-
-| Item | Location |
-|------|----------|
-| Spec | `docs/specs/002-launch-scheduler/spec.md` |
-| E2E tests | `src/e2e/tests/launches.page.spec.ts` (AC-002.1–AC-002.10) |
-| Frontend | `src/front/app/router/launch-scheduler-page.component.ts` |
-| Backend | Launches API (`GET/POST/PUT /api/launches`) |
-
-Planned command:
-
-```bash
-nub run test:e2e -- tests/launches.page.spec.ts
-```
-
-(from `src/e2e`; Playwright starts back + front automatically)
-
-Should I run all 10 acceptance-criteria tests (AC-002.1–AC-002.10) and generate the verification report? **(yes/no)**
-
----
-
-**User**
-
-yes
-
----
-
-**Cursor**
-
-Running the launch scheduler e2e tests, then generating the verification report.
+All 13 tests passed. Updating the verification report and marking the remaining criteria as verified.
 
 
-Reading the test results JSON for per-test timing and details.
+Committing the verification report per the verify skill.
 
 
-Generating the verification report and committing it per the verify skill.
+## Verification complete — **002 Launch Scheduler**
 
+All **13/13** e2e tests passed in **10.5s** (`src/e2e/tests/launches.page.spec.ts`).
 
-Verification complete for **002 Launch Scheduler**.
+| Result | Count |
+|--------|-------|
+| Passed | 13 |
+| Failed | 0 |
 
-## Result: FAILED (7/10)
+### Criteria status
 
-| Passed | Failed |
-|--------|--------|
-| AC-002.1, .4, .5, .6, .7, .8, .9 | AC-002.2, .3, .10 |
+All verification criteria (AC-002.1 through AC-002.13) are now marked verified in `spec.md`. The two that were previously failing are now passing:
 
-**Command:** `nub run test:e2e -- tests/launches.page.spec.ts` — 15.4s, exit code 1
+- **AC-002.9** — invalid price error on schedule/update
+- **AC-002.11** — 30-day collision error on schedule/update
 
-### Failures (test suite, not product)
+### Artifacts
 
-1. **AC-002.2 & AC-002.3** — Locale mismatch: `formatPrice()` uses system locale (`275,00 US$`) but the UI shows `$275.00`. Launches are created/updated correctly.
-2. **AC-002.10** — `expectToast` hits strict-mode violation when two error toasts are on screen; the error message does appear.
+- Report: `docs/specs/002-launch-scheduler/verify.report.md` (status: **verified**)
+- Commit: `d65b965` — `docs(launch-scheduler): verification report — all 13 AC verified`
 
-### Deliverables
+### Next step
 
-- Report: `docs/specs/002-launch-scheduler/verify.report.md`
-- Committed: `8f63654` — `docs(launch-scheduler): add verification report for spec 002`
-
-### Recommended next steps
-
-1. Pin `formatPrice` to `en-US` in e2e helpers.
-2. Make `expectToast` handle multiple toasts (e.g. `.last()` or filter by text).
-3. Re-run `/verify` to confirm all 10 pass.
-
-Want me to apply those test fixes?
+Run **`releasify`** to mark spec 002 as released.
 
