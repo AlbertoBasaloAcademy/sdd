@@ -8,11 +8,14 @@ import {
   insertLaunch,
   updateLaunch,
 } from "./launches.repository.js";
-import type { Launch, LaunchStatus, NewLaunch } from "./launches.types.js";
+import type { CancellationReason, Launch, LaunchStatus, NewLaunch } from "./launches.types.js";
 import {
+  CANCELLATION_REASONS,
+  ECONOMIC_CANCELLATION_BUFFER_MS,
   LAUNCH_STATUSES,
   SCHEDULE_COLLISION_BUFFER_MS,
   VALID_STATUS_TRANSITIONS,
+  isCancellationReason,
   isTerminalLaunchStatus,
   isValidPrice,
 } from "./launches.types.js";
@@ -103,6 +106,46 @@ const assertStatusTransition = (current: LaunchStatus, next: LaunchStatus): void
   }
 };
 
+const parseCancellationReason = (value: unknown): CancellationReason => {
+  if (!isCancellationReason(value)) {
+    throw new ApiError(
+      400,
+      `cancellation_reason must be one of: ${CANCELLATION_REASONS.join(", ")}`,
+    );
+  }
+  return value;
+};
+
+const assertEconomicCancellationAllowed = (scheduledAt: string): void => {
+  const timeUntilLaunch = new Date(scheduledAt).getTime() - Date.now();
+  if (timeUntilLaunch < ECONOMIC_CANCELLATION_BUFFER_MS) {
+    throw new ApiError(400, "Economic cancellation is not allowed within 7 days of launch");
+  }
+};
+
+const resolveCancellationReason = (
+  record: Record<string, unknown>,
+  existing: Launch,
+  status: LaunchStatus,
+  scheduledAt: string,
+): CancellationReason | undefined => {
+  if (status === "cancelled") {
+    const reason =
+      record["cancellation_reason"] !== undefined
+        ? parseCancellationReason(record["cancellation_reason"])
+        : existing.cancellation_reason;
+    if (!reason) {
+      throw new ApiError(400, "cancellation_reason is required when cancelling a launch");
+    }
+    if (reason === "economic") {
+      assertEconomicCancellationAllowed(scheduledAt);
+    }
+    return reason;
+  }
+
+  return undefined;
+};
+
 export const parseLaunchCreateInput = (body: unknown): Omit<NewLaunch, "status"> => {
   if (typeof body !== "object" || body === null) {
     throw new ApiError(400, "Invalid launch payload");
@@ -162,7 +205,9 @@ export const parseLaunchUpdateInput = (body: unknown, existing: Launch): NewLaun
 
   assertNoScheduleCollision(rocket_id, scheduled_at, existing.id);
 
-  return { price_per_passenger, rocket_id, scheduled_at, status };
+  const cancellation_reason = resolveCancellationReason(record, existing, status, scheduled_at);
+
+  return { cancellation_reason, price_per_passenger, rocket_id, scheduled_at, status };
 };
 
 export const createLaunch = (body: unknown): Launch => {

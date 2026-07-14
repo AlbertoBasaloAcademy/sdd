@@ -1,7 +1,9 @@
 import "../shared/components/page-header.component.js";
 import {
+  CANCELLATION_REASONS,
   listLaunches,
   updateLaunch,
+  type CancellationReason,
   type Launch,
   type LaunchStatus,
 } from "../shared/repositories/launches.repository.js";
@@ -26,6 +28,7 @@ const formatPrice = (price: number): string =>
 
 class LaunchSchedulerPage extends HTMLElement {
   #rockets: Rocket[] = [];
+  #pendingCancelId: string | null = null;
 
   public connectedCallback(): void {
     this.innerHTML = `
@@ -52,7 +55,36 @@ class LaunchSchedulerPage extends HTMLElement {
             <tbody id="launch-list"></tbody>
           </table>
         </div>
-      </section>`;
+      </section>
+      <dialog id="cancel-dialog">
+        <article>
+          <header>
+            <button type="button" aria-label="Close" rel="prev" id="cancel-dialog-close"></button>
+            <h3>Cancel launch</h3>
+          </header>
+          <p>Select a reason for cancelling this launch.</p>
+          <label for="cancel-reason">Cancellation reason</label>
+          <select id="cancel-reason" name="cancellation_reason" required>
+            <option value="">Select a reason…</option>
+            ${CANCELLATION_REASONS.map(
+              (reason) => `<option value="${reason}">${reason}</option>`,
+            ).join("")}
+          </select>
+          <p id="cancel-dialog-error" class="form-error" hidden></p>
+          <footer>
+            <button type="button" class="secondary" id="cancel-dialog-dismiss">Keep launch</button>
+            <button type="button" id="cancel-dialog-confirm">Confirm cancellation</button>
+          </footer>
+        </article>
+      </dialog>`;
+
+    this.querySelector("#cancel-dialog-close")?.addEventListener("click", () => this.#closeCancelDialog());
+    this.querySelector("#cancel-dialog-dismiss")?.addEventListener("click", () =>
+      this.#closeCancelDialog(),
+    );
+    this.querySelector("#cancel-dialog-confirm")?.addEventListener("click", () => {
+      void this.#confirmCancellation();
+    });
 
     const cached = launchesStore.get();
     if (cached) {
@@ -99,16 +131,17 @@ class LaunchSchedulerPage extends HTMLElement {
       return;
     }
 
-    listEl.innerHTML = launches
-      .map((launch) => this.#renderRow(launch))
-      .join("");
+    listEl.innerHTML = launches.map((launch) => this.#renderRow(launch)).join("");
 
     listEl.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
       button.addEventListener("click", () => {
-        void this.#handleAction(
-          button.dataset["id"] ?? "",
-          button.dataset["action"] as LaunchStatus,
-        );
+        const action = button.dataset["action"];
+        const id = button.dataset["id"] ?? "";
+        if (action === "cancelled") {
+          this.#openCancelDialog(id);
+          return;
+        }
+        void this.#handleAction(id, action as LaunchStatus);
       });
     });
   }
@@ -121,12 +154,17 @@ class LaunchSchedulerPage extends HTMLElement {
           <a href="/launches/${launch.id}/edit" role="button" class="secondary outline btn-sm">Edit</a>
           ${this.#statusButtons(launch)}`;
 
+    const statusLabel =
+      launch.status === "cancelled" && launch.cancellation_reason
+        ? `${launch.status} (${launch.cancellation_reason})`
+        : launch.status;
+
     return `
       <tr>
         <th scope="row">${this.#rocketName(launch.rocket_id)}</th>
         <td>${formatScheduledAt(launch.scheduled_at)}</td>
         <td>${formatPrice(launch.price_per_passenger)}</td>
-        <td><span class="fleet-status fleet-status-${launch.status}">${launch.status}</span></td>
+        <td><span class="fleet-status fleet-status-${launch.status}">${statusLabel}</span></td>
         <td class="fleet-actions">${actions}</td>
       </tr>`;
   }
@@ -146,6 +184,61 @@ class LaunchSchedulerPage extends HTMLElement {
       );
     }
     return buttons.join("");
+  }
+
+  #openCancelDialog(id: string): void {
+    if (!id) {
+      showToast("Invalid launch id", "error");
+      return;
+    }
+    this.#pendingCancelId = id;
+    const dialog = this.querySelector<HTMLDialogElement>("#cancel-dialog");
+    const reasonSelect = this.querySelector<HTMLSelectElement>("#cancel-reason");
+    const errorEl = this.querySelector<HTMLParagraphElement>("#cancel-dialog-error");
+    if (!dialog || !reasonSelect || !errorEl) {
+      return;
+    }
+    reasonSelect.value = "";
+    errorEl.hidden = true;
+    errorEl.textContent = "";
+    dialog.showModal();
+  }
+
+  #closeCancelDialog(): void {
+    this.#pendingCancelId = null;
+    this.querySelector<HTMLDialogElement>("#cancel-dialog")?.close();
+  }
+
+  async #confirmCancellation(): Promise<void> {
+    const id = this.#pendingCancelId;
+    const reasonSelect = this.querySelector<HTMLSelectElement>("#cancel-reason");
+    const errorEl = this.querySelector<HTMLParagraphElement>("#cancel-dialog-error");
+    if (!id || !reasonSelect || !errorEl) {
+      return;
+    }
+
+    const reason = reasonSelect.value as CancellationReason | "";
+    if (!reason) {
+      errorEl.textContent = "Select a cancellation reason";
+      errorEl.hidden = false;
+      return;
+    }
+
+    errorEl.hidden = true;
+    errorEl.textContent = "";
+
+    try {
+      await updateLaunch(id, { cancellation_reason: reason, status: "cancelled" });
+      showToast("Launch cancelled", "success");
+      this.#closeCancelDialog();
+      launchesStore.set(undefined);
+      await this.#loadLaunches();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to cancel launch";
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      showToast(message, "error");
+    }
   }
 
   async #handleAction(id: string, status: LaunchStatus): Promise<void> {

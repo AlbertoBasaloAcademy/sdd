@@ -32,10 +32,14 @@ describe("launches service", () => {
     }).id;
   };
 
-  const validCreatePayload = (rocketId = createActiveRocket()) => ({
+  const validCreatePayload = (
+    rocketId = createActiveRocket(),
+    overrides: { scheduled_at?: string; price_per_passenger?: number } = {},
+  ) => ({
     price_per_passenger: 2000,
     rocket_id: rocketId,
     scheduled_at: futureDate(),
+    ...overrides,
   });
 
   it("listLaunches returns launches", () => {
@@ -155,6 +159,50 @@ describe("launches service", () => {
     assert.strictEqual(updated.status, "confirmed");
   });
 
+  it("replaceLaunch cancels a launch with reason", () => {
+    const created = createLaunch(validCreatePayload());
+    const updated = replaceLaunch(created.id, {
+      cancellation_reason: "technical",
+      status: "cancelled",
+    });
+    assert.strictEqual(updated.status, "cancelled");
+    assert.strictEqual(updated.cancellation_reason, "technical");
+  });
+
+  it("replaceLaunch rejects cancellation without reason", () => {
+    const created = createLaunch(validCreatePayload());
+    assert.throws(
+      () => replaceLaunch(created.id, { status: "cancelled" }),
+      (err: unknown) => err instanceof ApiError && err.status === 400,
+    );
+  });
+
+  it("replaceLaunch rejects economic cancellation within 7 days", () => {
+    const created = createLaunch(
+      validCreatePayload(createActiveRocket(), { scheduled_at: futureDate(3) }),
+    );
+    assert.throws(
+      () =>
+        replaceLaunch(created.id, {
+          cancellation_reason: "economic",
+          status: "cancelled",
+        }),
+      (err: unknown) => err instanceof ApiError && err.status === 400,
+    );
+  });
+
+  it("replaceLaunch allows economic cancellation more than 7 days away", () => {
+    const created = createLaunch(
+      validCreatePayload(createActiveRocket(), { scheduled_at: futureDate(10) }),
+    );
+    const updated = replaceLaunch(created.id, {
+      cancellation_reason: "economic",
+      status: "cancelled",
+    });
+    assert.strictEqual(updated.status, "cancelled");
+    assert.strictEqual(updated.cancellation_reason, "economic");
+  });
+
   it("replaceLaunch rejects invalid status transition", () => {
     const created = createLaunch(validCreatePayload());
     assert.throws(
@@ -165,7 +213,7 @@ describe("launches service", () => {
 
   it("replaceLaunch rejects edits on terminal launch", () => {
     const created = createLaunch(validCreatePayload());
-    replaceLaunch(created.id, { status: "cancelled" });
+    replaceLaunch(created.id, { cancellation_reason: "technical", status: "cancelled" });
     assert.throws(
       () => replaceLaunch(created.id, { price_per_passenger: 10_000 }),
       (err: unknown) => err instanceof ApiError && err.status === 400,

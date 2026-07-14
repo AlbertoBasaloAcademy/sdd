@@ -4,18 +4,26 @@ export const LAUNCH_STATUSES = ["created", "confirmed", "cancelled", "completed"
 
 export type LaunchStatus = (typeof LAUNCH_STATUSES)[number];
 
+export const CANCELLATION_REASONS = ["economic", "technical", "meteorological"] as const;
+
+export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
+
 export interface Launch {
   id: string;
   rocket_id: string;
   scheduled_at: string;
   price_per_passenger: number;
   status: LaunchStatus;
+  cancellation_reason?: CancellationReason;
 }
 
 export type LaunchCreateInput = Pick<Launch, "rocket_id" | "scheduled_at" | "price_per_passenger">;
 
 export type LaunchUpdateInput = Partial<
-  Pick<Launch, "rocket_id" | "scheduled_at" | "price_per_passenger" | "status">
+  Pick<
+    Launch,
+    "rocket_id" | "scheduled_at" | "price_per_passenger" | "status" | "cancellation_reason"
+  >
 >;
 
 export const listLaunches = async (): Promise<Launch[]> => get<Launch[]>("/api/launches");
