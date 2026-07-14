@@ -279,7 +279,9 @@ test.describe("Launch Scheduler Page", () => {
       name: `Collision Rocket ${Date.now()}`,
       serial_number: `CL-${Date.now()}`,
     });
-    await createLaunchViaApi(request, rocket.id, { scheduled_at: futureScheduledAt(14) });
+    await createLaunchWithStatusViaApi(request, rocket.id, "cancelled", {
+      scheduled_at: futureScheduledAt(14),
+    });
 
     await page.goto("/launches/new");
     await waitForLaunchFormLoaded(page);
@@ -329,6 +331,28 @@ test.describe("Launch Scheduler Page", () => {
 
     const rows = page.getByRole("row").filter({ hasText: rocket.name });
     await expect(rows).toHaveCount(2);
+
+    const updateRocket = await createActiveRocketViaApi(request, {
+      name: `Buffer Update Rocket ${Date.now()}`,
+      serial_number: `BU-${Date.now()}`,
+    });
+    await createLaunchViaApi(request, updateRocket.id, { scheduled_at: futureScheduledAt(14) });
+    const movable = await createLaunchViaApi(request, updateRocket.id, {
+      scheduled_at: futureScheduledAt(50),
+    });
+
+    await page.goto(`/launches/${movable.id}/edit`);
+    await page
+      .locator('input[name="scheduled_at"]')
+      .fill(toDatetimeLocalValue(futureScheduledAt(44)));
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    await expect(page).toHaveURL("/launches");
+    await expectToast(page, "Launch updated", "success");
+    await waitForLaunchesLoaded(page);
+
+    const updateRows = page.getByRole("row").filter({ hasText: updateRocket.name });
+    await expect(updateRows).toHaveCount(2);
   });
 
   test("AC-002.13 shows an error when price is not a positive multiple of 1000", async ({
