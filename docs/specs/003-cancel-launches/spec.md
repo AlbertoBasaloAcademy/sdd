@@ -3,7 +3,7 @@ spec-id: 003
 spec-name: Cancel Launches
 spec-slug: cancel-launches
 spec-date: 2026-07-14
-status: in-progress
+status: completed
 spec-updated-at: 2026-07-14
 category: Launches
 tags: [launch, cancel, cancellation-reason, economic, technical, meteorological]
@@ -66,9 +66,9 @@ tags: [launch, cancel, cancellation-reason, economic, technical, meteorological]
 
 ## Verification criteria
 
-- [ ] **AC-003.1** — WHEN the user clicks Cancel on a launch in status `created` or `confirmed`, THEN a dialog prompts for a cancellation reason
-- [ ] **AC-003.2** — WHEN the user cancels a launch with reason `technical`, THEN the launch status becomes `cancelled` and the reason is shown in the list
-- [ ] **AC-003.3** — WHEN the user cancels a launch with reason `meteorological`, THEN the launch status becomes `cancelled` and the reason is shown in the list
-- [ ] **AC-003.4** — WHEN the user cancels a launch with reason `economic` and `scheduled_at` is more than 7 days away, THEN the launch status becomes `cancelled`
-- [ ] **AC-003.5** — WHEN the user tries to cancel with reason `economic` and `scheduled_at` is less than 7 days away, THEN the user should see an error message
-- [ ] **AC-003.6** — WHEN the user tries to confirm cancellation without selecting a reason, THEN the user should see an error message
+- [x] **AC-003.1** — WHEN the user clicks Cancel on a launch in status `created` or `confirmed`, THEN a dialog prompts for a cancellation reason
+- [x] **AC-003.2** — WHEN the user cancels a launch with reason `technical`, THEN the launch status becomes `cancelled` and the reason is shown in the list
+- [x] **AC-003.3** — WHEN the user cancels a launch with reason `meteorological`, THEN the launch status becomes `cancelled` and the reason is shown in the list
+- [x] **AC-003.4** — WHEN the user cancels a launch with reason `economic` and `scheduled_at` is more than 7 days away, THEN the launch status becomes `cancelled`
+- [x] **AC-003.5** — WHEN the user tries to cancel with reason `economic` and `scheduled_at` is less than 7 days away, THEN the user should see an error message
+- [x] **AC-003.6** — WHEN the user tries to confirm cancellation without selecting a reason, THEN the user should see an error message

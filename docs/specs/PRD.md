@@ -20,7 +20,7 @@ AstroBookings lets operators manage a rocket fleet and schedule passenger launch
 
 - **Tags**: `[launch, scheduler, list, schedule, edit, confirm, cancel, complete, collision-buffer, price-multiple]`
 
-### [003 Cancel Launches](./003-cancel-launches/spec.md) — in-progress
+### [003 Cancel Launches](./003-cancel-launches/spec.md) — completed
 
 - **Tags**: `[launch, cancel, cancellation-reason, economic, technical, meteorological]`
 

@@ -5,6 +5,31 @@ All notable changes to AstroBookings are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-07-14
+
+### Added
+
+- **Cancel Launches** (spec 003) — cancellation reasons and 7-day economic restriction
+  - **Backend API** (`src/back/api/launches/`)
+    - `cancellation_reason` field on launches (`economic`, `technical`, `meteorological`)
+    - Required when status changes to `cancelled`
+    - Rejects `economic` cancellation when `scheduled_at` is less than 7 days away
+    - Unit tests for reason validation and economic window
+  - **Frontend** (`src/front/app/router/launch-scheduler-page.component.ts`)
+    - Cancellation dialog with reason selector
+    - Displays cancellation reason in the launch list for cancelled launches
+  - **E2E tests** (`src/e2e/tests/cancel-launches.page.spec.ts`) — 6 acceptance-criteria tests (AC-003.1–AC-003.6)
+
+### Fixed
+
+- Routing e2e back-button test updated for current home page content
+
+### Verified
+
+- All 6 acceptance criteria (AC-003.1 through AC-003.6) passed via Playwright e2e suite
+- Full e2e suite: 51 tests passed
+- Verification report: `docs/specs/003-cancel-launches/verify.report.md`
+
 ## [0.3.0] - 2026-07-14
 
 ### Added

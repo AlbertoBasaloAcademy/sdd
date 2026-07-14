@@ -25,7 +25,7 @@ test.describe("Client-side routing", () => {
     await page.goBack();
 
     await expect(page).toHaveURL("/");
-    await expect(page.getByText("Hello, to the next world!")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Rocket Fleet" })).toBeVisible();
   });
 
   test("should serve deep links directly", async ({ page }) => {
