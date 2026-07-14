@@ -35,11 +35,65 @@ class LaunchFormPage extends HTMLElement {
         heading="${isEdit ? "Edit launch" : "Schedule launch"}"
         subtitle="Pick an active rocket, a future date and time, and a price per passenger.">
       </ab-page-header>
-      <form id="launch-form">
+      <p id="form-loading">Loading form…</p>`;
+
+    void this.#init(isEdit);
+  }
+
+  async #init(isEdit: boolean): Promise<void> {
+    try {
+      const rockets = await listRockets();
+      this.#activeRockets = rockets.filter((rocket) => rocket.status === "Active");
+
+      let launch: Launch | undefined;
+      if (isEdit && this.#launchId) {
+        launch = await this.#fetchLaunch(this.#launchId);
+        if (!launch) {
+          return;
+        }
+      }
+
+      this.#renderForm(isEdit, launch);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load form data";
+      showToast(message, "error");
+    }
+  }
+
+  async #fetchLaunch(id: string): Promise<Launch | undefined> {
+    const cached = launchesStore.get()?.find((launch) => launch.id === id);
+    const launch = cached ?? (await listLaunches()).find((item) => item.id === id);
+    if (!launch) {
+      showToast("Launch not found", "error");
+      globalThis.location.assign("/launches");
+      return undefined;
+    }
+    if (launch.status === "cancelled" || launch.status === "completed") {
+      showToast("Launch cannot be edited in terminal status", "error");
+      globalThis.location.assign("/launches");
+      return undefined;
+    }
+    return launch;
+  }
+
+  #renderForm(isEdit: boolean, launch?: Launch): void {
+    const rocketOptions =
+      this.#activeRockets.length === 0
+        ? `<option value="">No active rockets available</option>`
+        : this.#activeRockets
+            .map((rocket) => `<option value="${rocket.id}">${rocket.name}</option>`)
+            .join("");
+
+    this.innerHTML = `
+      <ab-page-header
+        heading="${isEdit ? "Edit launch" : "Schedule launch"}"
+        subtitle="Pick an active rocket, a future date and time, and a price per passenger.">
+      </ab-page-header>
+      <form id="launch-form" novalidate>
         <label>
           Rocket
           <select name="rocket_id" required id="rocket-select">
-            <option value="">Loading rockets…</option>
+            ${rocketOptions}
           </select>
         </label>
         <label>
@@ -60,52 +114,9 @@ class LaunchFormPage extends HTMLElement {
       void this.#submit();
     });
 
-    void this.#init(isEdit);
-  }
-
-  async #init(isEdit: boolean): Promise<void> {
-    try {
-      const rockets = await listRockets();
-      this.#activeRockets = rockets.filter((rocket) => rocket.status === "Active");
-      this.#renderRocketOptions();
-
-      if (isEdit && this.#launchId) {
-        await this.#loadLaunch(this.#launchId);
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load form data";
-      showToast(message, "error");
+    if (launch) {
+      this.#fillForm(launch);
     }
-  }
-
-  #renderRocketOptions(): void {
-    const select = this.querySelector<HTMLSelectElement>("#rocket-select");
-    if (!select) {
-      return;
-    }
-    if (this.#activeRockets.length === 0) {
-      select.innerHTML = `<option value="">No active rockets available</option>`;
-      return;
-    }
-    select.innerHTML = this.#activeRockets
-      .map((rocket) => `<option value="${rocket.id}">${rocket.name}</option>`)
-      .join("");
-  }
-
-  async #loadLaunch(id: string): Promise<void> {
-    const cached = launchesStore.get()?.find((launch) => launch.id === id);
-    const launch = cached ?? (await listLaunches()).find((item) => item.id === id);
-    if (!launch) {
-      showToast("Launch not found", "error");
-      globalThis.location.assign("/launches");
-      return;
-    }
-    if (launch.status === "cancelled" || launch.status === "completed") {
-      showToast("Launch cannot be edited in terminal status", "error");
-      globalThis.location.assign("/launches");
-      return;
-    }
-    this.#fillForm(launch);
   }
 
   #fillForm(launch: Launch): void {
