@@ -30,6 +30,8 @@ Write working code or e2e tests to implement a spec.
 
 - Ask me one question at a time with closed-ended questions until I give you the confirmation.
 - Identify the desired target (working code or e2e tests) and the spec file.
+- If the spec is an amendment (already implemented feature), identify which criteria were added, modified or removed — those are your target; leave the rest untouched.
+- Check the git diff to identify the changes to the spec file.
 - If a report with defects to fix is provided, identify the defects and the code to fix them.
 
 ### 2. Planning
@@ -37,6 +39,7 @@ Write working code or e2e tests to implement a spec.
 - Generate the implementation plan to generate the spec or its e2e tests.
 - Be precise and detailed in the implementation plan.
 - If target is working code, generate the code and its unit tests.
+- If target is e2e tests, name each test after the criterion it verifies (`AC-{NNN}.{n}`). Removed criteria mean removed tests; modified criteria mean updated tests.
 
 ### 3. Implementation
 
@@ -49,3 +52,4 @@ Write working code or e2e tests to implement a spec.
 - [ ] The code is working (compiled and executed successfully).
 - [ ] If has unit tests, all the tests are passing.
 - [ ] It the target is e2e code, do not run it, only check and compile.
+- [ ] On amendments, only code and tests for changed criteria were touched.

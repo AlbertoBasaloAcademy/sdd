@@ -36,6 +36,7 @@ Execute the e2e tests and generate a verification report.
 ### 3. Implementation
 
 - Run the e2e tests.
+- **Triage every failing test**: if its criterion is unchanged in the spec, it is a **regression** — report it, never modify the test. If its criterion was modified or removed in this amendment, the failure is **expected** — flag the test to be updated or deleted via `codify`.
 - Generate the verification report at `docs/specs/{spec-slug}/verify.report.md`.
 - Commit the verification report to the repository.
 - Check at the spec file all the verification criteria and mark them as verified or failed. Do not change the spec status.

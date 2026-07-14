@@ -3,7 +3,10 @@ spec-id: {NNN}
 spec-name: {Feature Name}
 spec-slug: {feature-slug}
 spec-date: {YYYY-MM-DD}
-status: {pending, in-progress, failed, completed}
+spec-updated-at: {YYYY-MM-DD}
+status: {pending, in-progress, failed, completed},
+category : {unique main category of the spec}
+tags: {optional array of tags [tag1, tag2, tag3]}
 ---
 #  {NNN} {Feature Name}  Spec
 

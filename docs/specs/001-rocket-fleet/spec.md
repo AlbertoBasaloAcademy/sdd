@@ -4,6 +4,9 @@ spec-name: Rocket Fleet
 spec-slug: rocket-fleet
 spec-date: 2026-07-10
 status: completed
+spec-updated-at: 2026-07-10
+category: Rockets
+tags: [rocket, fleet, list, add, edit, deactivate]
 ---
 
 # 001 Rocket Fleet Spec
