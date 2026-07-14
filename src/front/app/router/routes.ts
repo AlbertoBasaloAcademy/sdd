@@ -15,6 +15,17 @@ export const routes: Route[] = [
     title: `About — ${appTitle}`,
   },
   {
+    load: async () => import("./booking-form-page.component.js").then((m) => m.tagName),
+    pattern: new URLPattern({ pathname: "/bookings/new" }),
+    title: `Create booking — ${appTitle}`,
+  },
+  {
+    load: async () => import("./bookings-page.component.js").then((m) => m.tagName),
+    menu: { href: "/bookings", label: "Bookings" },
+    pattern: new URLPattern({ pathname: "/bookings" }),
+    title: `Bookings — ${appTitle}`,
+  },
+  {
     load: async () => import("./launch-form-page.component.js").then((m) => m.tagName),
     pattern: new URLPattern({ pathname: "/launches/new" }),
     title: `Schedule launch — ${appTitle}`,

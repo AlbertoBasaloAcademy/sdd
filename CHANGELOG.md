@@ -5,6 +5,29 @@ All notable changes to AstroBookings are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-07-14
+
+### Added
+
+- **Create Bookings** (spec 004) — passenger reservations for available launches
+  - **Backend API** (`src/back/api/bookings/`)
+    - `GET /api/bookings` — list all bookings
+    - `POST /api/bookings` — create a booking for a launch in status `created` or `confirmed`
+    - Validates launch availability, passenger name, email, and phone
+    - Unit tests for service and controller
+  - **Frontend** (`src/front/app/router/`, `src/front/app/shared/`)
+    - Bookings page (`/bookings`) — list bookings with launch details
+    - Booking form page (`/bookings/new`) — pick an available launch and enter passenger details
+    - Bookings nav menu entry
+    - Toast feedback for all operations
+  - **E2E tests** (`src/e2e/tests/create-bookings.page.spec.ts`) — 7 acceptance-criteria tests (AC-004.1–AC-004.7)
+
+### Verified
+
+- All 7 acceptance criteria (AC-004.1 through AC-004.7) passed via Playwright e2e suite
+- Full e2e suite: 58 tests passed
+- Verification report: `docs/specs/004-create-bookings/verify.report.md`
+
 ## [0.4.0] - 2026-07-14
 
 ### Added
@@ -90,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Frontend: fleet list, add/edit rocket forms, deactivation
   - E2E tests for all acceptance criteria
 
-[0.3.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.2.0...v0.3.0
+[0.5.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.3.0...v0.4.0
 [0.2.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/AlbertoBasaloAcademy/sdd/releases/tag/v0.1.0

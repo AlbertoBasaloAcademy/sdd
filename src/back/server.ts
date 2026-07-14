@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { apiRouter } from "./api/api.js";
+import { startBookings } from "./api/bookings/bookings.service.js";
 import { startHealthTracking } from "./api/health/health.service.js";
 import { startLaunches } from "./api/launches/launches.service.js";
 import { startRockets } from "./api/rockets/rockets.service.js";
@@ -19,4 +20,5 @@ app.use(errorHandler);
 startHealthTracking();
 startRockets();
 startLaunches();
+startBookings();
 listen(app, port);

@@ -4,6 +4,8 @@ export const LAUNCH_STATUSES = ["created", "confirmed", "cancelled", "completed"
 
 export type LaunchStatus = (typeof LAUNCH_STATUSES)[number];
 
+export const BOOKABLE_LAUNCH_STATUSES = ["created", "confirmed"] as const;
+
 export const CANCELLATION_REASONS = ["economic", "technical", "meteorological"] as const;
 
 export type CancellationReason = (typeof CANCELLATION_REASONS)[number];

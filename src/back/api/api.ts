@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getHealth } from "./health/health.controller.js";
+import { getBookings, postBooking } from "./bookings/bookings.controller.js";
 import { getLaunches, postLaunch, putLaunch } from "./launches/launches.controller.js";
 import {
   deleteRocketById,
@@ -11,6 +12,8 @@ import {
 export const apiRouter: Router = Router();
 
 apiRouter.get("/health", getHealth);
+apiRouter.get("/bookings", getBookings);
+apiRouter.post("/bookings", postBooking);
 apiRouter.get("/launches", getLaunches);
 apiRouter.post("/launches", postLaunch);
 apiRouter.put("/launches/:id", putLaunch);

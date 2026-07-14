@@ -24,5 +24,13 @@ AstroBookings lets operators manage a rocket fleet and schedule passenger launch
 
 - **Tags**: `[launch, cancel, cancellation-reason, economic, technical, meteorological]`
 
+---
+
+## Bookings
+
+### [004 Create Bookings](./004-create-bookings/spec.md) — completed
+
+- **Tags**: `[booking, create, launch, passenger, name, email, phone]`
+
 
 See [CHANGELOG.md](../../CHANGELOG.md) for detailed change notes.
