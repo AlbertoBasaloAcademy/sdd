@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import {
   buildLaunchPayload,
+  cancelLaunchViaDialog,
   createActiveRocketViaApi,
   createLaunchViaApi,
   createLaunchWithStatusViaApi,
@@ -120,10 +121,11 @@ test.describe("Launch Scheduler Page", () => {
     await waitForLaunchesLoaded(page);
 
     const createdRow = launchRow(page, createdRocket.name);
-    await createdRow.getByRole("button", { name: "Cancel" }).click();
+    await cancelLaunchViaDialog(page, "technical", createdRow);
     await expectToast(page, "Launch cancelled", "success");
     await waitForLaunchesLoaded(page);
     await expect(createdRow).toContainText("cancelled");
+    await expect(createdRow).toContainText("technical");
 
     const confirmedRocket = await createActiveRocketViaApi(request, {
       name: `Cancel Confirmed ${Date.now()}`,
@@ -135,7 +137,7 @@ test.describe("Launch Scheduler Page", () => {
     await waitForLaunchesLoaded(page);
 
     const confirmedRow = launchRow(page, confirmedRocket.name);
-    await confirmedRow.getByRole("button", { name: "Cancel" }).click();
+    await cancelLaunchViaDialog(page, "meteorological", confirmedRow);
     await expectToast(page, "Launch cancelled", "success");
     await waitForLaunchesLoaded(page);
     await expect(confirmedRow).toContainText("cancelled");

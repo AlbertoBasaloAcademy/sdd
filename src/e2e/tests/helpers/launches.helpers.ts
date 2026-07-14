@@ -1,9 +1,13 @@
-import { expect, type APIRequestContext, type Page } from "@playwright/test";
+import { expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 import { createRocketViaApi, expectToast, type Rocket } from "./rockets.helpers.js";
 
 export const LAUNCH_STATUSES = ["created", "confirmed", "cancelled", "completed"] as const;
 
 export type LaunchStatus = (typeof LAUNCH_STATUSES)[number];
+
+export const CANCELLATION_REASONS = ["economic", "technical", "meteorological"] as const;
+
+export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
 
 export interface LaunchPayload {
   rocket_id: string;
@@ -14,6 +18,7 @@ export interface LaunchPayload {
 export interface Launch extends LaunchPayload {
   id: string;
   status: LaunchStatus;
+  cancellation_reason?: CancellationReason;
 }
 
 const DEFAULT_API_PORT = 3000;
@@ -104,7 +109,10 @@ export const createLaunchWithStatusViaApi = async (
   }
 
   if (status === "cancelled") {
-    return updateLaunchViaApi(request, launch, { status: "cancelled" });
+    return updateLaunchViaApi(request, launch, {
+      cancellation_reason: "technical",
+      status: "cancelled",
+    });
   }
 
   const confirmed = await updateLaunchViaApi(request, launch, { status: "confirmed" });
@@ -140,5 +148,18 @@ export const waitForLaunchFormLoaded = async (page: Page): Promise<void> => {
 
 export const launchRow = (page: Page, rocketName: string) =>
   page.getByRole("row").filter({ hasText: rocketName });
+
+export const cancelLaunchViaDialog = async (
+  page: Page,
+  reason: CancellationReason,
+  row?: Locator,
+): Promise<void> => {
+  if (row) {
+    await row.getByRole("button", { name: "Cancel" }).click();
+  }
+  await expect(page.locator("#cancel-dialog")).toBeVisible();
+  await page.locator("#cancel-reason").selectOption(reason);
+  await page.getByRole("button", { name: "Confirm cancellation" }).click();
+};
 
 export { expectToast };
