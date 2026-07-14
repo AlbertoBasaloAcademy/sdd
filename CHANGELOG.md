@@ -5,6 +5,32 @@ All notable changes to AstroBookings are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-07-14
+
+### Added
+
+- **Launch Scheduler enhancements** (spec 002) — 30-day schedule collision buffer and price multiples of 1000
+  - **Backend API** (`src/back/api/launches/`)
+    - Reject launches on the same rocket scheduled less than 30 days apart (any status), excluding the launch being updated
+    - Accept schedules exactly 30 days before or after another launch on the same rocket
+    - Enforce `price_per_passenger` as a positive multiple of 1000 (minimum 1000)
+    - `findLaunchesByRocketId` repository query for collision checks
+    - Unit tests for collision buffer, price multiples, and self-exclusion on update
+  - **Frontend** (`src/front/app/router/launch-form-page.component.ts`)
+    - Price input constrained to multiples of 1000 (`min="1000"`, `step="1000"`)
+    - Form re-rendered after data load so API validation errors display on edit
+    - `novalidate` on form to surface server-side validation messages
+  - **E2E tests** (`src/e2e/tests/launches.page.spec.ts`) — 3 new acceptance-criteria tests (AC-002.11–AC-002.13), 13 total
+
+### Fixed
+
+- Launch edit form no longer silently fails when the API returns validation errors
+
+### Verified
+
+- All 13 acceptance criteria (AC-002.1 through AC-002.13) passed via Playwright e2e suite
+- Verification report: `docs/specs/002-launch-scheduler/verify.report.md`
+
 ## [0.2.0] - 2026-07-13
 
 ### Added
@@ -39,5 +65,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Frontend: fleet list, add/edit rocket forms, deactivation
   - E2E tests for all acceptance criteria
 
+[0.3.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/AlbertoBasaloAcademy/sdd/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/AlbertoBasaloAcademy/sdd/releases/tag/v0.1.0

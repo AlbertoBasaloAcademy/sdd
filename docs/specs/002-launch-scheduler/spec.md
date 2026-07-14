@@ -3,7 +3,7 @@ spec-id: 002
 spec-name: Launch Scheduler
 spec-slug: launch-scheduler
 spec-date: 2026-07-11
-status: in-progress
+status: completed
 spec-updated-at: 2026-07-14
 category: Launches
 tags: [launch, scheduler, list, schedule, edit, confirm, cancel, complete, collision-buffer, price-multiple]
