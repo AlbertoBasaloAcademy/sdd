@@ -66,6 +66,13 @@ export const findLaunchById = (id: string): Launch | undefined => {
   return row ? rowToLaunch(row) : undefined;
 };
 
+export const findLaunchesByRocketId = (rocketId: string): Launch[] => {
+  const SELECT =
+    "SELECT id, rocket_id, scheduled_at, price_per_passenger, status FROM launches WHERE rocket_id = ? ORDER BY scheduled_at ASC";
+  const rows = getDb().prepare(SELECT).all(rocketId) as unknown as LaunchRow[];
+  return rows.map(rowToLaunch);
+};
+
 export const insertLaunch = (input: NewLaunch): Launch => {
   const id = randomUUID();
   const INSERT =

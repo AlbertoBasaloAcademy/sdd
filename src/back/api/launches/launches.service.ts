@@ -3,6 +3,7 @@ import { findRocketById } from "../rockets/rockets.repository.js";
 import {
   findAllLaunches,
   findLaunchById,
+  findLaunchesByRocketId,
   initLaunchesRepository,
   insertLaunch,
   updateLaunch,
@@ -10,6 +11,7 @@ import {
 import type { Launch, LaunchStatus, NewLaunch } from "./launches.types.js";
 import {
   LAUNCH_STATUSES,
+  SCHEDULE_COLLISION_BUFFER_MS,
   VALID_STATUS_TRANSITIONS,
   isTerminalLaunchStatus,
   isValidPrice,
@@ -48,7 +50,10 @@ const parseScheduledAt = (value: unknown): string => {
 
 const parsePrice = (value: unknown): number => {
   if (typeof value !== "number" || !isValidPrice(value)) {
-    throw new ApiError(400, "price_per_passenger must be a positive number greater than zero");
+    throw new ApiError(
+      400,
+      "price_per_passenger must be a positive multiple of 1000 (minimum 1000)",
+    );
   }
   return value;
 };
@@ -67,6 +72,24 @@ const assertFutureSchedule = (scheduledAt: string): void => {
   const scheduledTime = new Date(scheduledAt).getTime();
   if (scheduledTime <= Date.now()) {
     throw new ApiError(400, "scheduled_at must be in the future");
+  }
+};
+
+const assertNoScheduleCollision = (
+  rocketId: string,
+  scheduledAt: string,
+  excludeLaunchId?: string,
+): void => {
+  const scheduledTime = new Date(scheduledAt).getTime();
+  const others = findLaunchesByRocketId(rocketId).filter((launch) => launch.id !== excludeLaunchId);
+  for (const launch of others) {
+    const diff = Math.abs(new Date(launch.scheduled_at).getTime() - scheduledTime);
+    if (diff < SCHEDULE_COLLISION_BUFFER_MS) {
+      throw new ApiError(
+        400,
+        "Another launch on this rocket is scheduled less than 30 days from the requested time",
+      );
+    }
   }
 };
 
@@ -92,6 +115,7 @@ export const parseLaunchCreateInput = (body: unknown): Omit<NewLaunch, "status">
 
   assertActiveRocket(rocket_id);
   assertFutureSchedule(scheduled_at);
+  assertNoScheduleCollision(rocket_id, scheduled_at);
 
   return { price_per_passenger, rocket_id, scheduled_at };
 };
@@ -135,6 +159,8 @@ export const parseLaunchUpdateInput = (body: unknown, existing: Launch): NewLaun
   if (status === "created" || status === "confirmed") {
     assertFutureSchedule(scheduled_at);
   }
+
+  assertNoScheduleCollision(rocket_id, scheduled_at, existing.id);
 
   return { price_per_passenger, rocket_id, scheduled_at, status };
 };

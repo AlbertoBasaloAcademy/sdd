@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { listRockets, startRockets } from "../rockets/rockets.service.js";
+import { createRocket, startRockets } from "../rockets/rockets.service.js";
 import { getLaunches, postLaunch, putLaunch } from "./launches.controller.js";
 import { startLaunches } from "./launches.service.js";
 
@@ -32,8 +32,18 @@ describe("launches controller", () => {
   startRockets();
   startLaunches();
 
-  const activeRocketId = (): string =>
-    listRockets().find((rocket) => rocket.status === "Active")!.id;
+  let rocketCounter = 0;
+
+  const createActiveRocket = (): string => {
+    rocketCounter += 1;
+    return createRocket({
+      capacity: 4,
+      name: `Launch Controller Rocket ${rocketCounter}`,
+      range: "Earth Orbit",
+      serial_number: `LC-${rocketCounter}-${Date.now()}`,
+      status: "Active",
+    }).id;
+  };
 
   const futureDate = (): string => new Date(Date.now() + 86_400_000).toISOString();
 
@@ -47,8 +57,8 @@ describe("launches controller", () => {
     const mock = createMockRes();
     const req = {
       body: {
-        price_per_passenger: 1800,
-        rocket_id: activeRocketId(),
+        price_per_passenger: 2000,
+        rocket_id: createActiveRocket(),
         scheduled_at: futureDate(),
       },
     } as Request;
@@ -60,16 +70,17 @@ describe("launches controller", () => {
 
   it("postLaunch returns 400 for invalid payload", () => {
     const mock = createMockRes();
-    postLaunch({ body: { rocket_id: activeRocketId() } } as Request, mock.res);
+    postLaunch({ body: { rocket_id: createActiveRocket() } } as Request, mock.res);
     assert.strictEqual(mock.getStatusCode(), 400);
     assert.ok((mock.getBody() as { error: string }).error);
   });
 
   it("putLaunch updates launch status", () => {
     const createMock = createMockRes();
+    const rocketId = createActiveRocket();
     const payload = {
-      price_per_passenger: 1900,
-      rocket_id: activeRocketId(),
+      price_per_passenger: 3000,
+      rocket_id: rocketId,
       scheduled_at: futureDate(),
     };
     postLaunch({ body: payload } as Request, createMock.res);

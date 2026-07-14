@@ -26,5 +26,12 @@ export const VALID_STATUS_TRANSITIONS: Record<LaunchStatus, readonly LaunchStatu
   created: ["confirmed", "cancelled"],
 };
 
+export const MIN_PRICE_PER_PASSENGER = 1000;
+export const PRICE_STEP = 1000;
+export const SCHEDULE_COLLISION_BUFFER_MS = 30 * 24 * 60 * 60 * 1000;
+
 export const isValidPrice = (value: number): boolean =>
-  typeof value === "number" && Number.isFinite(value) && value > 0;
+  typeof value === "number" &&
+  Number.isFinite(value) &&
+  value >= MIN_PRICE_PER_PASSENGER &&
+  value % PRICE_STEP === 0;

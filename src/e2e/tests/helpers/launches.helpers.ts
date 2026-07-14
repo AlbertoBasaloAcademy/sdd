@@ -47,7 +47,7 @@ export const buildLaunchPayload = (
   rocketId: string,
   overrides: Partial<LaunchPayload> = {},
 ): LaunchPayload => ({
-  price_per_passenger: 150,
+  price_per_passenger: 2000,
   rocket_id: rocketId,
   scheduled_at: futureScheduledAt(),
   ...overrides,

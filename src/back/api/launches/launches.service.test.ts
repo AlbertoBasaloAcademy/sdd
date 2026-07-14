@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ApiError } from "../../server/errors.js";
-import { listRockets, startRockets } from "../rockets/rockets.service.js";
+import { createRocket, listRockets, startRockets } from "../rockets/rockets.service.js";
 import {
   createLaunch,
   listLaunches,
@@ -11,19 +11,30 @@ import {
   startLaunches,
 } from "./launches.service.js";
 
-const futureDate = (): string => new Date(Date.now() + 86_400_000).toISOString();
+const futureDate = (daysFromNow = 7): string =>
+  new Date(Date.now() + daysFromNow * 86_400_000).toISOString();
 const pastDate = (): string => new Date(Date.now() - 86_400_000).toISOString();
 
 describe("launches service", () => {
   startRockets();
   startLaunches();
 
-  const activeRocket = (): string =>
-    listRockets().find((rocket) => rocket.status === "Active")!.id;
+  let rocketCounter = 0;
 
-  const validCreatePayload = () => ({
-    price_per_passenger: 1200,
-    rocket_id: activeRocket(),
+  const createActiveRocket = (): string => {
+    rocketCounter += 1;
+    return createRocket({
+      capacity: 4,
+      name: `Launch Test Rocket ${rocketCounter}`,
+      range: "Earth Orbit",
+      serial_number: `LT-${rocketCounter}-${Date.now()}`,
+      status: "Active",
+    }).id;
+  };
+
+  const validCreatePayload = (rocketId = createActiveRocket()) => ({
+    price_per_passenger: 2000,
+    rocket_id: rocketId,
     scheduled_at: futureDate(),
   });
 
@@ -76,6 +87,62 @@ describe("launches service", () => {
     );
   });
 
+  it("parseLaunchCreateInput rejects price not a multiple of 1000", () => {
+    assert.throws(
+      () =>
+        parseLaunchCreateInput({
+          ...validCreatePayload(),
+          price_per_passenger: 1500,
+        }),
+      (err: unknown) =>
+        err instanceof ApiError &&
+        err.status === 400 &&
+        err.message.includes("multiple of 1000"),
+    );
+  });
+
+  it("parseLaunchCreateInput rejects schedule collision within 30 days", () => {
+    const rocketId = createActiveRocket();
+    const scheduledAt = futureDate(14);
+    createLaunch({ price_per_passenger: 2000, rocket_id: rocketId, scheduled_at: scheduledAt });
+
+    const tooSoon = new Date(new Date(scheduledAt).getTime() + 15 * 86_400_000).toISOString();
+    assert.throws(
+      () =>
+        parseLaunchCreateInput({
+          price_per_passenger: 3000,
+          rocket_id: rocketId,
+          scheduled_at: tooSoon,
+        }),
+      (err: unknown) =>
+        err instanceof ApiError &&
+        err.status === 400 &&
+        err.message.includes("less than 30 days"),
+    );
+  });
+
+  it("parseLaunchCreateInput accepts schedule exactly 30 days apart", () => {
+    const rocketId = createActiveRocket();
+    const scheduledAt = futureDate(14);
+    createLaunch({ price_per_passenger: 2000, rocket_id: rocketId, scheduled_at: scheduledAt });
+
+    const exactlyThirtyDaysLater = new Date(
+      new Date(scheduledAt).getTime() + 30 * 86_400_000,
+    ).toISOString();
+    const parsed = parseLaunchCreateInput({
+      price_per_passenger: 3000,
+      rocket_id: rocketId,
+      scheduled_at: exactlyThirtyDaysLater,
+    });
+    assert.strictEqual(parsed.rocket_id, rocketId);
+  });
+
+  it("parseLaunchUpdateInput excludes self from schedule collision check", () => {
+    const created = createLaunch(validCreatePayload());
+    const parsed = parseLaunchUpdateInput({ price_per_passenger: 4000 }, created);
+    assert.strictEqual(parsed.price_per_passenger, 4000);
+  });
+
   it("createLaunch persists with status created", () => {
     const created = createLaunch(validCreatePayload());
     assert.ok(created.id);
@@ -100,7 +167,7 @@ describe("launches service", () => {
     const created = createLaunch(validCreatePayload());
     replaceLaunch(created.id, { status: "cancelled" });
     assert.throws(
-      () => replaceLaunch(created.id, { price_per_passenger: 9999 }),
+      () => replaceLaunch(created.id, { price_per_passenger: 10_000 }),
       (err: unknown) => err instanceof ApiError && err.status === 400,
     );
   });

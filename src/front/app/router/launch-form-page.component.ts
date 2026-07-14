@@ -48,7 +48,7 @@ class LaunchFormPage extends HTMLElement {
         </label>
         <label>
           Price per passenger
-          <input name="price_per_passenger" type="number" min="0.01" step="0.01" required />
+          <input name="price_per_passenger" type="number" min="1000" step="1000" required />
         </label>
         <p id="form-error" role="alert"></p>
         <button type="submit">${isEdit ? "Save changes" : "Schedule launch"}</button>

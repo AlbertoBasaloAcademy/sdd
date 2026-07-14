@@ -38,7 +38,7 @@ test.describe("Launch Scheduler Page", () => {
       serial_number: `SC-${Date.now()}`,
     });
     const payload = buildLaunchPayload(rocket.id, {
-      price_per_passenger: 275,
+      price_per_passenger: 3000,
       scheduled_at: futureScheduledAt(14),
     });
 
@@ -64,15 +64,15 @@ test.describe("Launch Scheduler Page", () => {
       serial_number: `ED-${Date.now()}`,
     });
     const created = await createLaunchViaApi(request, rocket.id, {
-      price_per_passenger: 100,
+      price_per_passenger: 1000,
       scheduled_at: futureScheduledAt(10),
     });
-    const updatedPrice = 399;
+    const updatedPrice = 4000;
 
     await page.goto(`/launches/${created.id}/edit`);
 
     await expect(page.getByRole("heading", { name: "Edit launch" })).toBeVisible();
-    await expect(page.locator('input[name="price_per_passenger"]')).toHaveValue("100");
+    await expect(page.locator('input[name="price_per_passenger"]')).toHaveValue("1000");
 
     await fillLaunchForm(page, {
       price_per_passenger: updatedPrice,
@@ -244,11 +244,11 @@ test.describe("Launch Scheduler Page", () => {
 
     await expect(page).toHaveURL("/launches/new");
     await expect(page.locator("#form-error")).toHaveText(
-      /price_per_passenger must be a positive number greater than zero/,
+      /price_per_passenger must be a positive multiple of 1000/,
     );
     await expectToast(
       page,
-      /price_per_passenger must be a positive number greater than zero/,
+      /price_per_passenger must be a positive multiple of 1000/,
       "error",
     );
 
@@ -262,11 +262,118 @@ test.describe("Launch Scheduler Page", () => {
 
     await expect(page).toHaveURL(`/launches/${created.id}/edit`);
     await expect(page.locator("#form-error")).toHaveText(
-      /price_per_passenger must be a positive number greater than zero/,
+      /price_per_passenger must be a positive multiple of 1000/,
     );
     await expectToast(
       page,
-      /price_per_passenger must be a positive number greater than zero/,
+      /price_per_passenger must be a positive multiple of 1000/,
+      "error",
+    );
+  });
+
+  test("AC-002.11 shows an error when scheduling within 30 days of another launch on the same rocket", async ({
+    page,
+    request,
+  }) => {
+    const rocket = await createActiveRocketViaApi(request, {
+      name: `Collision Rocket ${Date.now()}`,
+      serial_number: `CL-${Date.now()}`,
+    });
+    await createLaunchViaApi(request, rocket.id, { scheduled_at: futureScheduledAt(14) });
+
+    await page.goto("/launches/new");
+    await waitForLaunchFormLoaded(page);
+    await fillLaunchForm(
+      page,
+      buildLaunchPayload(rocket.id, { scheduled_at: futureScheduledAt(25) }),
+    );
+    await page.getByRole("button", { name: "Schedule launch" }).click();
+
+    await expect(page).toHaveURL("/launches/new");
+    await expect(page.locator("#form-error")).toHaveText(/less than 30 days/);
+    await expectToast(page, /less than 30 days/, "error");
+
+    const created = await createLaunchViaApi(request, rocket.id, {
+      scheduled_at: futureScheduledAt(44),
+    });
+    await page.goto(`/launches/${created.id}/edit`);
+    await page
+      .locator('input[name="scheduled_at"]')
+      .fill(toDatetimeLocalValue(futureScheduledAt(20)));
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    await expect(page).toHaveURL(`/launches/${created.id}/edit`);
+    await expect(page.locator("#form-error")).toHaveText(/less than 30 days/);
+    await expectToast(page, /less than 30 days/, "error");
+  });
+
+  test("AC-002.12 accepts a launch exactly 30 days from another on the same rocket", async ({
+    page,
+    request,
+  }) => {
+    const rocket = await createActiveRocketViaApi(request, {
+      name: `Buffer Rocket ${Date.now()}`,
+      serial_number: `BF-${Date.now()}`,
+    });
+    await createLaunchViaApi(request, rocket.id, { scheduled_at: futureScheduledAt(14) });
+
+    const payload = buildLaunchPayload(rocket.id, { scheduled_at: futureScheduledAt(44) });
+    await page.goto("/launches/new");
+    await waitForLaunchFormLoaded(page);
+    await fillLaunchForm(page, payload);
+    await page.getByRole("button", { name: "Schedule launch" }).click();
+
+    await expect(page).toHaveURL("/launches");
+    await expectToast(page, "Launch scheduled", "success");
+    await waitForLaunchesLoaded(page);
+
+    const rows = page.getByRole("row").filter({ hasText: rocket.name });
+    await expect(rows).toHaveCount(2);
+  });
+
+  test("AC-002.13 shows an error when price is not a positive multiple of 1000", async ({
+    page,
+    request,
+  }) => {
+    const rocket = await createActiveRocketViaApi(request, {
+      name: `Price Multiple Rocket ${Date.now()}`,
+      serial_number: `PM-${Date.now()}`,
+    });
+
+    await page.goto("/launches/new");
+    await waitForLaunchFormLoaded(page);
+    await fillLaunchForm(page, buildLaunchPayload(rocket.id));
+    await page.locator('input[name="price_per_passenger"]').evaluate((input: HTMLInputElement) => {
+      input.removeAttribute("step");
+      input.value = "1500";
+    });
+    await page.getByRole("button", { name: "Schedule launch" }).click();
+
+    await expect(page).toHaveURL("/launches/new");
+    await expect(page.locator("#form-error")).toHaveText(
+      /price_per_passenger must be a positive multiple of 1000/,
+    );
+    await expectToast(
+      page,
+      /price_per_passenger must be a positive multiple of 1000/,
+      "error",
+    );
+
+    const created = await createLaunchViaApi(request, rocket.id);
+    await page.goto(`/launches/${created.id}/edit`);
+    await page.locator('input[name="price_per_passenger"]').evaluate((input: HTMLInputElement) => {
+      input.removeAttribute("step");
+      input.value = "2500";
+    });
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    await expect(page).toHaveURL(`/launches/${created.id}/edit`);
+    await expect(page.locator("#form-error")).toHaveText(
+      /price_per_passenger must be a positive multiple of 1000/,
+    );
+    await expectToast(
+      page,
+      /price_per_passenger must be a positive multiple of 1000/,
       "error",
     );
   });
@@ -280,7 +387,7 @@ test.describe("Launch Scheduler Page", () => {
       serial_number: `TM-${Date.now()}`,
     });
     const cancelled = await createLaunchWithStatusViaApi(request, rocket.id, "cancelled");
-    await createLaunchViaApi(request, rocket.id);
+    await createLaunchViaApi(request, rocket.id, { scheduled_at: futureScheduledAt(44) });
 
     await page.goto(`/launches/${cancelled.id}/edit`);
     await expectToast(page, /Launch cannot be edited in terminal status/, "error");
