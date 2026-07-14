@@ -100,8 +100,8 @@ tags: [launch, scheduler, list, schedule, edit, confirm, cancel, complete, colli
 - [x] **AC-002.6** — WHEN the user completes a launch in status `confirmed`, THEN the launch status should become `completed`
 - [x] **AC-002.7** — WHEN the user tries to schedule a launch with a non-Active rocket, THEN the user should see an error message
 - [x] **AC-002.8** — WHEN the user tries to schedule or update a launch with a past date and time, THEN the user should see an error message
-- [ ] **AC-002.9** — WHEN the user tries to schedule or update a launch with invalid price, THEN the user should see an error message
+- [x] **AC-002.9** — WHEN the user tries to schedule or update a launch with invalid price, THEN the user should see an error message
 - [x] **AC-002.10** — WHEN the user tries to edit or change the status of a terminal launch, THEN the user should see an error message
-- [ ] **AC-002.11** — WHEN the user tries to schedule or update a launch on a rocket that already has another launch less than 30 days away (any status), THEN the user should see an error message
+- [x] **AC-002.11** — WHEN the user tries to schedule or update a launch on a rocket that already has another launch less than 30 days away (any status), THEN the user should see an error message
 - [x] **AC-002.12** — WHEN the user schedules or updates a launch exactly 30 days before or after another launch on the same rocket, THEN the launch should be accepted
 - [x] **AC-002.13** — WHEN the user tries to schedule or update a launch with a price that is not a positive multiple of 1000, THEN the user should see an error message
